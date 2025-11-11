@@ -19,30 +19,41 @@ on:
 
 jobs:
   test:
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest  # Of windows-latest/macOS-latest als specifiek platform nodig is
     steps:
       - name: Haal de repository op
         uses: actions/checkout@v4
-
+ 
       - name: Installeer .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
-
+          dotnet-version: '8.0.x'  # Gebruik de juiste versie voor MAUI
+ 
       - name: Installeer MAUI workloads
-        run: dotnet workload install maui-maccatalyst
-
+        run: dotnet workload install maui-android
+ 
       - name: Herstel afhankelijkheden
         run: dotnet restore
-
+ 
       - name: Bouw de applicatie
-        run: dotnet build Grocery.App/Grocery.App.csproj --configuration Release --no-restore --framework net8.0-maccatalyst /p:ApplicationId=nl.windesheim.groceryapp
-
-      - name: Voer unit tests uit en genereer rapport
-        run: dotnet test --configuration Release --verbosity normal --results-directory "TestResults" --logger "trx;LogFileName=testresults.trx"
-
-      - name: Upload test resultaten
+        run: dotnet build --configuration Release --no-restore
+        
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: TestResults/testresults.trx
+          name: GroceryApp-build
+          path: |
+            **/bin/Release/net8.0-windows10.0.19041.0/win-x64/
+            !**/*.pdb   # (optioneel: exclude symbol files)
+        
+      - name: Voer unit tests uit
+        run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
+
+      - name: Upload testresultaten
+        if: always()   # ook uploaden als tests falen
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: |
+            **/TestResults/
+            **/test_results.trx
