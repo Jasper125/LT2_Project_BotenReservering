@@ -7,8 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Repositories\" />
+    <ProjectReference Include="..\ProjectBotenReservering.Core\ProjectBotenReservering.Core.csproj" />
   </ItemGroup>
 
 </Project>
