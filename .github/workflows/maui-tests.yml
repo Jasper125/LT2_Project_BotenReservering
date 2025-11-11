@@ -1,0 +1,48 @@
+name: MAUI Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+      - hotfix/*
+      - release/*
+      - infra/runner-toevoegen
+  pull_request:
+    branches:
+      - main
+      - feature/*
+      - hotfix/*
+      - release/*
+      - develop
+
+jobs:
+  test:
+    runs-on: macOS-latest
+    steps:
+      - name: Haal de repository op
+        uses: actions/checkout@v4
+
+      - name: Installeer .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Installeer MAUI workloads
+        run: dotnet workload install maui-maccatalyst
+
+      - name: Herstel afhankelijkheden
+        run: dotnet restore
+
+      - name: Bouw de applicatie
+        run: dotnet build Grocery.App/Grocery.App.csproj --configuration Release --no-restore --framework net8.0-maccatalyst /p:ApplicationId=nl.windesheim.groceryapp
+
+      - name: Voer unit tests uit en genereer rapport
+        run: dotnet test --configuration Release --verbosity normal --results-directory "TestResults" --logger "trx;LogFileName=testresults.trx"
+
+      - name: Upload test resultaten
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/testresults.trx
