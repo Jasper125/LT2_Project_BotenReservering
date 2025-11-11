@@ -32,6 +32,9 @@ jobs:
       - name: Installeer MAUI workloads
         run: dotnet workload install maui-maccatalyst
 
+      - name: Restore all required .NET workloads
+        run: dotnet workload restore
+
       - name: Herstel afhankelijkheden
         run: dotnet restore
 
