@@ -35,11 +35,17 @@ jobs:
       - name: Restore all required .NET workloads
         run: dotnet workload restore
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore dependencies including win-x64 runtime pack
+        run: dotnet restore -r win-x64
 
-      - name: Build the application
-        run: dotnet build ProjectBotenReservering.App/ProjectBotenReservering.App.csproj --configuration Release --no-restore --framework net9.0-windows10.0.19041.0
+      - name: List installed .NET runtimes
+        run: dotnet --list-runtimes
+
+      - name: List installed workloads
+        run: dotnet workload list
+
+      - name: Build the application (uses restored runtime pack)
+        run: dotnet build ProjectBotenReservering.App/ProjectBotenReservering.App.csproj --configuration Release --no-restore --framework net9.0-windows10.0.19041.0 -r win-x64
 
       - name: Run unit tests and generate report
         run: dotnet test --configuration Release --verbosity normal --results-directory "TestResults" --logger "trx;LogFileName=testresults.trx"
@@ -48,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-windows
-          path: TestResults/testresults.trx.trx
+          path: TestResults/testresults.trx
