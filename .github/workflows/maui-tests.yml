@@ -19,33 +19,33 @@ on:
 
 jobs:
   test:
-    runs-on: macOS-latest
+    runs-on: windows-latest
     steps:
-      - name: Haal de repository op
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Installeer .NET SDK
+      - name: Install .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Installeer MAUI workloads
-        run: dotnet workload install maui-maccatalyst
+      - name: Install MAUI workloads
+        run: dotnet workload install maui-windows
 
       - name: Restore all required .NET workloads
         run: dotnet workload restore
 
-      - name: Herstel afhankelijkheden
+      - name: Restore dependencies
         run: dotnet restore
 
-      - name: Bouw de applicatie
-        run: dotnet build ProjectBotenReservering.App/ProjectBotenReservering.App.csproj --configuration Release --no-restore --framework net9.0-maccatalyst
+      - name: Build the application
+        run: dotnet build ProjectBotenReservering.App/ProjectBotenReservering.App.csproj --configuration Release --no-restore --framework net9.0-windows10.0.19041.0
 
-      - name: Voer unit tests uit en genereer rapport
+      - name: Run unit tests and generate report
         run: dotnet test --configuration Release --verbosity normal --results-directory "TestResults" --logger "trx;LogFileName=testresults.trx"
 
-      - name: Upload test resultaten
+      - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: TestResults/testresults.trx
+          name: test-results-windows
+          path: TestResults/testresults.trx.trx
